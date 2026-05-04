@@ -19,18 +19,22 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
-      - name: Install dependencies
+      - name: Install all dependencies
         run: npm ci
 
-      - name: Build
+      - name: Build (prisma generate + tsc)
         run: npm run build
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
+      - name: Remove dev dependencies
+        run: npm prune --omit=dev
 
       - name: Prepare deployment package
         run: |
           mkdir deploy
           cp -r dist deploy/
+          cp -r node_modules deploy/
           cp -r prisma deploy/
           cp package.json deploy/
           cp package-lock.json deploy/
